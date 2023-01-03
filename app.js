@@ -15,7 +15,7 @@ app.get('/endpoint1', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    exec('./sem-6000.exp f --status --print', (error, stdout, stderr) => {
+    exec('../sem-6000.exp f --status --print', (error, stdout, stderr) => {
         if (error) {
             console.error(`exec error: ${error}`);
             return;
