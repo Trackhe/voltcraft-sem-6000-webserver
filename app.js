@@ -15,21 +15,12 @@ app.get('/endpoint1', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    //exec('python3 script.py', (error, stdout, stderr) => {
-        //if (error) {
-        //    console.error(`exec error: ${error}`);
-        //    return;
-        //}
+    exec('./sem-6000.exp f --status --print', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
 
-        const stdout = `
-    Status:
-      Power:                on
-      Voltage:              229 VAC
-      Ampere:               1.136 A
-      Watts:                185.161 W
-      Frequency:            50 Hz
-      Power factor:         0.71
-    `;
 
         let power = 0
         let voltage = 0
@@ -48,33 +39,36 @@ app.get('/', (req, res) => {
         const current_regex = /^\s*Ampere:\s+(\S+)\s+(\S+)$/gm
         const watts_regex = /^\s*Watts:\s+(\S+)\s+(\S+)$/gm
         const frequency_regex = /^\s*Frequency:\s+(\S+)\s+(\S+)$/gm
-        const power_factor_regex = /^\s*Power Factor:\s+(\S+)$/gm
+        const power_factor_regex = /^\s*Power factor:\s+(\S+)$/gm
 
         const rows = stdout.match(row)
+
         //while through the rows
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].indexOf("Power:") !== -1) {
                 power = power_regex.exec(rows[i])[1]
-                console.log(power)
             }
             if (rows[i].indexOf("Voltage:") !== -1) {
-
-                voltage = voltage_regex.exec(rows[i])[1]
-                voltage_unit = voltage_regex.exec(rows[i])[2]
+                voltage = voltage_regex.exec(rows[i])
+                voltage_unit = voltage[2]
+                voltage = voltage[1]
             }
             if (rows[i].indexOf("Ampere:") !== -1) {
-                current = current_regex.exec(rows[i])[1]
-                current_unit = current_regex.exec(rows[i])[2]
+                current = current_regex.exec(rows[i])
+                current_unit = current[2]
+                current = current[1]
             }
             if (rows[i].indexOf("Watts:") !== -1) {
-                watts = watts_regex.exec(rows[i])[1]
-                watts_unit = watts_regex.exec(rows[i])[2]
+                watts = watts_regex.exec(rows[i])
+                watts_unit = watts[2]
+                watts = watts[1]
             }
             if (rows[i].indexOf("Frequency:") !== -1) {
-                frequency = frequency_regex.exec(rows[i])[1]
-                frequency_unit = frequency_regex.exec(rows[i])[2]
+                frequency = frequency_regex.exec(rows[i])
+                frequency_unit = frequency[2]
+                frequency = frequency[1]
             }
-            if (rows[i].indexOf("Power Factor:") !== -1) {
+            if (rows[i].indexOf("Power factor:") !== -1) {
                 power_factor = power_factor_regex.exec(rows[i])[1]
             }
         }
@@ -82,8 +76,8 @@ app.get('/', (req, res) => {
         //console.log({ power, voltage, voltage_unit, current, current_unit, watts, watts_unit, frequency, frequency_unit, power_factor })
 
 
-        //res.send({ power, voltage, voltage_unit, current, current_unit, watts, watts_unit, frequency, frequency_unit, power_factor });
-    //});
+        res.send({ power, voltage, voltage_unit, current, current_unit, watts, watts_unit, frequency, frequency_unit, power_factor });
+    });
 });
 
 app.get('/temperature', (req, res) => {
